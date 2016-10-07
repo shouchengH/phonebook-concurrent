@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#define __USE_GNU 
+#include <unistd.h>
+#include <sched.h>
 
 #include "phonebook_opt.h"
 #include "debug.h"
@@ -45,10 +48,16 @@ void append(void *arg)
 {
     struct timespec start, end;
     double cpu_time;
+	 cpu_set_t mask;
 
     clock_gettime(CLOCK_REALTIME, &start);
 
     append_a *app = (append_a *) arg;
+
+	
+	CPU_ZERO(&mask);      
+	CPU_SET(app->tid, &mask); 
+	sched_setaffinity(app->tid+1, sizeof(mask), &mask); 
 
     int count = 0;
     entry *j = app->entryStart;
